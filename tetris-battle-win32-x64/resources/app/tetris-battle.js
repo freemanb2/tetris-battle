@@ -4,6 +4,8 @@ var map1;
 var map2;
 var restarted = false;
 var first = true;
+var success;
+var place;
 
 var p1 = {
   id: 1,
@@ -59,6 +61,13 @@ var Tetris = new Phaser.Class({
   preload: function() {
     this.load.tilemapTiledJSON('map', 'assets/tilemaps/tetris-grid.json');
     this.load.image('tetris-tileset', 'assets/tilemaps/tetris-tilemapimage.png');
+
+    //I did not create this sound. Success sound obtained from https://freesound.org/people/grunz/sounds/109663/. 
+    //Original author is the user Grunz. Sound is available under the Creative Commons Attribution License.
+    this.load.audio('clear-line', 'assets/109663__grunz__success-low.wav');
+    //I did not create this sound. Pop sound obtained from https://freesound.org/people/kwahmah_02/sounds/260614/. 
+    //Original author is the user kwahmah_02. Sound is available under the Creative Commons Attribution License.
+    this.load.audio('place-block', 'assets/260614__kwahmah-02__pop.wav');
   },
 
   create: function(){
@@ -75,6 +84,9 @@ var Tetris = new Phaser.Class({
     var layer2 = map2.createDynamicLayer('Tile Layer 1', tileset2, 530, 25);
 
     this.p2hold = this.add.text(650, 700, "Hold: None", {fontSize: 24});
+
+    success = this.sound.add('clear-line');
+    place = this.sound.add('place-block');
 
     //P1 Controls
 
@@ -276,6 +288,7 @@ function dropTetromino(player){
     player.activeTetrominoY++;
   }
   renderTetromino(player);
+  place.play();
   clearLines(player);
   generateNewTetromino(player);
 }
@@ -489,6 +502,7 @@ function updateActiveTetromino(player){
     renderTetromino(player);
   }
   else{
+    place.play();
     clearLines(player);
     generateNewTetromino(player);
   }
@@ -507,6 +521,7 @@ function clearLines(player){
       }
     }
     if(canClear){
+      success.play();
       for(var j = 0; j < player.map.width; j++){
         player.map.putTileAt(1, j, player.activeTetrominoY + i)
       }
